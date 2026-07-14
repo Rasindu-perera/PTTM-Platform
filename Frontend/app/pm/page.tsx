@@ -20,7 +20,13 @@ const taskSchema = z.object({
   assigned_to_id: z.string().min(1, { message: "Please assign the task to a team member." }),
 });
 
+const projectSchema = z.object({
+  name: z.string().min(3, { message: "Project name must be at least 3 characters." }),
+  description: z.string().min(1, { message: "Description is required." }),
+});
+
 type TaskFormValues = z.infer<typeof taskSchema>;
+type ProjectFormValues = z.infer<typeof projectSchema>;
 
 interface Project {
   id: number;
@@ -28,6 +34,13 @@ interface Project {
   description: string;
   // We make team_members optional since the backend might not return it immediately
   team_members?: string[]; 
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
 }
 
 const fetcher = (url: string) => api.get(url).then(res => res.data);
@@ -38,11 +51,17 @@ export default function PMDashboard() {
 
   const [activeTab, setActiveTab] = useState<"projects" | "tasks">("projects");
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: { title: "", description: "", project_id: "", status: "pending", assigned_to_id: "" },
+  });
+
+  const { register: registerProject, handleSubmit: handleProjectSubmit, reset: resetProject, formState: { errors: projectErrors } } = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: { name: "", description: "" },
   });
 
   useEffect(() => {
@@ -54,12 +73,13 @@ export default function PMDashboard() {
   }, [user, router]);
 
   // Data Fetching using SWR
-  // Note: /tasks endpoint might need to be created if not exists on the backend.
-  const { data: projectsData, error: projectsError, isLoading: projectsLoading } = useSWR(user?.role === "project_manager" ? "/projects" : null, fetcher);
+  const { data: projectsData, error: projectsError, isLoading: projectsLoading, mutate: mutateProjects } = useSWR(user?.role === "project_manager" ? "/projects" : null, fetcher);
   const { data: tasksData, error: tasksError, mutate: mutateTasks, isLoading: tasksLoading } = useSWR(user?.role === "project_manager" ? "/tasks" : null, fetcher);
+  const { data: usersData } = useSWR(user?.role === "project_manager" ? "/users" : null, fetcher);
 
   const projects: Project[] = Array.isArray(projectsData) ? projectsData : projectsData?.projects || [];
   const tasks: Task[] = Array.isArray(tasksData) ? tasksData : tasksData?.tasks || [];
+  const users: User[] = Array.isArray(usersData) ? usersData : usersData?.users || [];
 
   const onSubmit = async (data: TaskFormValues) => {
     setIsSubmitting(true);
@@ -67,9 +87,23 @@ export default function PMDashboard() {
       await api.post("/tasks", data);
       mutateTasks(); // Refetch tasks automatically
       closeModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create task", error);
-      alert("Failed to create task. Check if the POST /api/tasks endpoint is working.");
+      alert(`Failed to create task: ${error.response?.data?.error || error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onProjectSubmit = async (data: ProjectFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await api.post("/projects", data);
+      mutateProjects(); // Refetch projects automatically
+      closeProjectModal();
+    } catch (error: any) {
+      console.error("Failed to create project", error);
+      alert(`Failed to create project: ${error.response?.data?.error || error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -78,6 +112,11 @@ export default function PMDashboard() {
   const closeModal = () => {
     setIsTaskModalOpen(false);
     reset(); 
+  };
+
+  const closeProjectModal = () => {
+    setIsProjectModalOpen(false);
+    resetProject(); 
   };
 
   if (!user || user.role !== "project_manager") {
@@ -109,12 +148,21 @@ export default function PMDashboard() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Project Manager Dashboard</h1>
           <p className="text-slate-500 mt-1">Manage your projects and coordinate team tasks.</p>
         </div>
-        <button 
-          onClick={() => setIsTaskModalOpen(true)}
-          className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
-        >
-          + Create Task
-        </button>
+        {activeTab === "projects" ? (
+          <button 
+            onClick={() => setIsProjectModalOpen(true)}
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            + Create Project
+          </button>
+        ) : (
+          <button 
+            onClick={() => setIsTaskModalOpen(true)}
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            + Create Task
+          </button>
+        )}
       </header>
 
       <div className="flex overflow-x-auto border-b border-slate-200 hide-scrollbar">
@@ -244,15 +292,18 @@ export default function PMDashboard() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Assign To (User ID)</label>
-            <input 
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Assign To</label>
+            <select 
               {...register("assigned_to_id")}
-              type="text"
-              placeholder="e.g. 1"
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 ${
                 errors.assigned_to_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
               }`}
-            />
+            >
+              <option value="" disabled>Select User...</option>
+              {users.map(u => (
+                <option key={u.id} value={u.id.toString()}>{u.name} ({u.role.replace('_', ' ')})</option>
+              ))}
+            </select>
             {errors.assigned_to_id && <p className="text-red-500 text-xs mt-1.5">{errors.assigned_to_id.message}</p>}
           </div>
 
@@ -271,6 +322,53 @@ export default function PMDashboard() {
               className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold"
             >
               {isSubmitting ? "Creating..." : "Create Task"}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Project Modal */}
+      <Modal isOpen={isProjectModalOpen} onClose={closeProjectModal} title="Create New Project">
+        <form onSubmit={handleProjectSubmit(onProjectSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Project Name</label>
+            <input 
+              {...registerProject("name")}
+              type="text" 
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 ${
+                projectErrors.name ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              }`}
+            />
+            {projectErrors.name && <p className="text-red-500 text-xs mt-1.5">{projectErrors.name.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
+            <textarea 
+              {...registerProject("description")}
+              rows={4}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-slate-50 ${
+                projectErrors.description ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              }`}
+            />
+            {projectErrors.description && <p className="text-red-500 text-xs mt-1.5">{projectErrors.description.message}</p>}
+          </div>
+
+          <div className="pt-5 flex flex-col-reverse sm:flex-row gap-3">
+            <button 
+              type="button"
+              onClick={closeProjectModal}
+              disabled={isSubmitting}
+              className="w-full sm:flex-1 px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-lg font-bold"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold"
+            >
+              {isSubmitting ? "Creating..." : "Create Project"}
             </button>
           </div>
         </form>

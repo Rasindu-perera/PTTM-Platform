@@ -8,14 +8,18 @@ const { sendTaskAssignmentEmail } = require('../utils/emailService');
 const createTask = async (req, res) => {
   const { project_id, title, description, assigned_to_id, status } = req.body;
   
+  // Convert empty strings to null for database integer fields
+  const finalProjectId = project_id ? parseInt(project_id, 10) : null;
+  const finalAssignedToId = assigned_to_id ? parseInt(assigned_to_id, 10) : null;
+
   try {
     const insertQuery = `
       INSERT INTO tasks (project_id, title, description, assigned_to_id, status)
-      VALUES ($1, $2, $3, $4, COALESCE($5, 'pending'))
+      VALUES ($1, $2, $3, $4, COALESCE($5, 'pending')::task_status)
       RETURNING *
     `;
     // We use COALESCE so if status is not provided, it defaults to 'pending'
-    const result = await db.query(insertQuery, [project_id, title, description, assigned_to_id, status]);
+    const result = await db.query(insertQuery, [finalProjectId, title, description, finalAssignedToId, status]);
 
     res.status(201).json({
       message: 'Task created successfully',
@@ -23,9 +27,9 @@ const createTask = async (req, res) => {
     });
 
     // --- Send Email Notification Asynchronously ---
-    if (assigned_to_id) {
+    if (finalAssignedToId) {
       try {
-        const userResult = await db.query('SELECT email FROM users WHERE id = $1', [assigned_to_id]);
+        const userResult = await db.query('SELECT email FROM users WHERE id = $1', [finalAssignedToId]);
         const projectResult = await db.query('SELECT name FROM projects WHERE id = $1', [project_id]);
         
         if (userResult.rows.length > 0 && projectResult.rows.length > 0) {
@@ -41,7 +45,7 @@ const createTask = async (req, res) => {
     }
   } catch (error) {
     console.error('Create task error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error', details: error.stack });
   }
 };
 
@@ -53,12 +57,39 @@ const getTasksByProject = async (req, res) => {
   const { projectId } = req.params;
 
   try {
-    const query = 'SELECT * FROM tasks WHERE project_id = $1 ORDER BY created_at DESC';
+    const query = `
+      SELECT tasks.*, users.name AS assigned_to_name 
+      FROM tasks 
+      LEFT JOIN users ON tasks.assigned_to_id = users.id 
+      WHERE project_id = $1 
+      ORDER BY tasks.created_at DESC
+    `;
     const result = await db.query(query, [projectId]);
     
     res.status(200).json({ tasks: result.rows });
   } catch (error) {
     console.error('Get tasks error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * Get all tasks (for PMs and Admins)
+ * GET /api/tasks
+ */
+const getAllTasks = async (req, res) => {
+  try {
+    const query = `
+      SELECT tasks.*, users.name AS assigned_to_name 
+      FROM tasks 
+      LEFT JOIN users ON tasks.assigned_to_id = users.id 
+      ORDER BY tasks.created_at DESC
+    `;
+    const result = await db.query(query);
+    
+    res.status(200).json({ tasks: result.rows });
+  } catch (error) {
+    console.error('Get all tasks error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -136,6 +167,7 @@ const deleteTask = async (req, res) => {
 module.exports = {
   createTask,
   getTasksByProject,
+  getAllTasks,
   updateTaskStatus,
   deleteTask
 };

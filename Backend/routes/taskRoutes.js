@@ -13,6 +13,16 @@ router.post(
   taskController.createTask
 );
 
+// Get all tasks
+// GET /api/tasks
+// Allowed: 'admin', 'project_manager'
+router.get(
+  '/', 
+  verifyToken, 
+  checkRole(['admin', 'project_manager']), 
+  taskController.getAllTasks
+);
+
 // Get all tasks for a specific project
 // GET /api/tasks/project/:projectId
 // Allowed: 'admin', 'project_manager', 'team_member'
