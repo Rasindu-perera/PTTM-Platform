@@ -31,7 +31,7 @@ export default function TaskCard({ task, onEdit, onStatusChange }: TaskCardProps
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow duration-300 flex flex-col h-full group">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group">
       <div className="flex justify-between items-start mb-3 gap-2">
         <h4 className="font-bold text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition-colors" title={task.title}>
           {task.title}

@@ -151,14 +151,14 @@ export default function PMDashboard() {
         {activeTab === "projects" ? (
           <button 
             onClick={() => setIsProjectModalOpen(true)}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:shadow-md transform hover:-translate-y-0.5"
           >
             + Create Project
           </button>
         ) : (
           <button 
             onClick={() => setIsTaskModalOpen(true)}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:shadow-md transform hover:-translate-y-0.5"
           >
             + Create Task
           </button>
@@ -243,8 +243,8 @@ export default function PMDashboard() {
             <input 
               {...register("title")}
               type="text" 
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 ${
-                errors.title ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all shadow-sm ${
+                errors.title ? "border-red-500 ring-1 ring-red-500" : "border-slate-200 focus:bg-white"
               }`}
             />
             {errors.title && <p className="text-red-500 text-xs mt-1.5">{errors.title.message}</p>}
@@ -255,8 +255,8 @@ export default function PMDashboard() {
             <textarea 
               {...register("description")}
               rows={3}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-slate-50 ${
-                errors.description ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-slate-50 transition-all shadow-sm ${
+                errors.description ? "border-red-500 ring-1 ring-red-500" : "border-slate-200 focus:bg-white"
               }`}
             />
             {errors.description && <p className="text-red-500 text-xs mt-1.5">{errors.description.message}</p>}
@@ -267,8 +267,8 @@ export default function PMDashboard() {
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Project</label>
               <select 
                 {...register("project_id")}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 ${
-                  errors.project_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+                className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all shadow-sm cursor-pointer ${
+                  errors.project_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-200 focus:bg-white"
                 }`}
               >
                 <option value="" disabled>Select Project...</option>
@@ -282,7 +282,7 @@ export default function PMDashboard() {
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Status</label>
               <select 
                 {...register("status")}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white transition-all shadow-sm cursor-pointer"
               >
                 <option value="pending">Pending</option>
                 <option value="in_progress">In Progress</option>
@@ -295,8 +295,8 @@ export default function PMDashboard() {
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Assign To</label>
             <select 
               {...register("assigned_to_id")}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 ${
-                errors.assigned_to_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all shadow-sm cursor-pointer ${
+                errors.assigned_to_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-200 focus:bg-white"
               }`}
             >
               <option value="" disabled>Select User...</option>
@@ -312,14 +312,14 @@ export default function PMDashboard() {
               type="button"
               onClick={closeModal}
               disabled={isSubmitting}
-              className="w-full sm:flex-1 px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-lg font-bold"
+              className="w-full sm:flex-1 px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-bold bg-white hover:bg-slate-50 shadow-sm"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold"
+              className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold shadow-sm transition-all transform hover:-translate-y-0.5"
             >
               {isSubmitting ? "Creating..." : "Create Task"}
             </button>
@@ -335,8 +335,8 @@ export default function PMDashboard() {
             <input 
               {...registerProject("name")}
               type="text" 
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 ${
-                projectErrors.name ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 transition-all shadow-sm ${
+                projectErrors.name ? "border-red-500 ring-1 ring-red-500" : "border-slate-200 focus:bg-white"
               }`}
             />
             {projectErrors.name && <p className="text-red-500 text-xs mt-1.5">{projectErrors.name.message}</p>}
@@ -347,8 +347,8 @@ export default function PMDashboard() {
             <textarea 
               {...registerProject("description")}
               rows={4}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-slate-50 ${
-                projectErrors.description ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-slate-50 transition-all shadow-sm ${
+                projectErrors.description ? "border-red-500 ring-1 ring-red-500" : "border-slate-200 focus:bg-white"
               }`}
             />
             {projectErrors.description && <p className="text-red-500 text-xs mt-1.5">{projectErrors.description.message}</p>}
@@ -359,14 +359,14 @@ export default function PMDashboard() {
               type="button"
               onClick={closeProjectModal}
               disabled={isSubmitting}
-              className="w-full sm:flex-1 px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-lg font-bold"
+              className="w-full sm:flex-1 px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-bold bg-white hover:bg-slate-50 shadow-sm"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold"
+              className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold shadow-sm transition-all transform hover:-translate-y-0.5"
             >
               {isSubmitting ? "Creating..." : "Create Project"}
             </button>

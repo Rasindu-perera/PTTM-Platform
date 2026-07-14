@@ -161,7 +161,7 @@ export default function AdminDashboard() {
         <button
           onClick={() => setActiveTab("users")}
           className={`py-3 px-8 text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === "users" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+            activeTab === "users" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
           }`}
         >
           Manage Users
@@ -179,11 +179,11 @@ export default function AdminDashboard() {
       {/* Users Section */}
       {activeTab === "users" && (
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-50/50 gap-4">
-          <h2 className="text-xl font-bold text-slate-800">Manage Users</h2>
+        <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white gap-4">
+          <h2 className="text-xl font-extrabold text-slate-900">Manage Users</h2>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-all transform hover:-translate-y-0.5"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all transform hover:-translate-y-0.5 hover:shadow-md"
           >
             + Create New User
           </button>
@@ -210,10 +210,10 @@ export default function AdminDashboard() {
                       <select 
                         value={u.role} 
                         onChange={(e) => handleChangeRole(u.id, e.target.value)}
-                        className={`text-xs font-bold rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer ${
-                          u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 
-                          u.role === 'project_manager' ? 'bg-blue-100 text-blue-700' : 
-                          'bg-emerald-100 text-emerald-700'
+                        className={`text-xs font-bold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer border ${
+                          u.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-200' : 
+                          u.role === 'project_manager' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                          'bg-emerald-50 text-emerald-700 border-emerald-200'
                         }`}
                       >
                         <option value="team_member">Team Member</option>
@@ -246,11 +246,11 @@ export default function AdminDashboard() {
       {/* Projects Section */}
       {activeTab === "projects" && (
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-2">
-        <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-50/50 gap-4">
-          <h2 className="text-xl font-bold text-slate-800">All System Projects</h2>
+        <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white gap-4">
+          <h2 className="text-xl font-extrabold text-slate-900">All System Projects</h2>
           <button 
             onClick={() => setIsProjectModalOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-all transform hover:-translate-y-0.5"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all transform hover:-translate-y-0.5 hover:shadow-md"
           >
             + Create New Project
           </button>
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
               type="text" 
               value={newUser.name}
               onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
               placeholder="John Doe"
             />
           </div>
@@ -310,7 +310,7 @@ export default function AdminDashboard() {
               type="email" 
               value={newUser.email}
               onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
               placeholder="john@example.com"
             />
           </div>
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
               type="password" 
               value={newUser.password}
               onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
               placeholder="••••••••"
             />
           </div>
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
             <select 
               value={newUser.role}
               onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm cursor-pointer"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm cursor-pointer"
             >
               <option value="team_member">Team Member</option>
               <option value="project_manager">Project Manager</option>
@@ -341,14 +341,14 @@ export default function AdminDashboard() {
             <button 
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="flex-1 px-4 py-2.5 bg-white border-2 border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all font-bold"
+              className="flex-1 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all font-bold shadow-sm"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-bold"
+              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 font-bold"
             >
               {isSubmitting ? "Creating..." : "Create User"}
             </button>
@@ -366,7 +366,7 @@ export default function AdminDashboard() {
               type="text" 
               value={newProject.name}
               onChange={(e) => setNewProject({...newProject, name: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
               placeholder="E.g. Apollo Redesign"
             />
           </div>
@@ -376,7 +376,7 @@ export default function AdminDashboard() {
               required
               value={newProject.description}
               onChange={(e) => setNewProject({...newProject, description: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm resize-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm resize-none"
               placeholder="Project description and goals..."
               rows={4}
             />
@@ -387,7 +387,7 @@ export default function AdminDashboard() {
               required
               value={newProject.manager_id}
               onChange={(e) => setNewProject({...newProject, manager_id: e.target.value})}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm cursor-pointer"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm cursor-pointer"
             >
               <option value="" disabled>Select a PM...</option>
               {users.filter(u => u.role === 'project_manager').map(pm => (
@@ -399,14 +399,14 @@ export default function AdminDashboard() {
             <button 
               type="button"
               onClick={() => setIsProjectModalOpen(false)}
-              className="flex-1 px-4 py-2.5 bg-white border-2 border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all font-bold"
+              className="flex-1 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all font-bold shadow-sm"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-bold"
+              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 font-bold"
             >
               {isSubmitting ? "Creating..." : "Create Project"}
             </button>

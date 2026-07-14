@@ -19,9 +19,9 @@ interface KanbanColumnProps {
 }
 
 const KanbanColumn = ({ title, count, headerColor, items, isLoading, onStatusChange }: KanbanColumnProps) => (
-  <div className="flex flex-col bg-slate-100/50 rounded-2xl border border-slate-200 overflow-hidden h-[70vh] min-h-[500px]">
-    <div className={`px-5 py-4 border-b border-slate-200 flex justify-between items-center ${headerColor}`}>
-      <h2 className="font-extrabold text-slate-800 tracking-tight">{title}</h2>
+  <div className="flex flex-col bg-slate-50/50 rounded-2xl border border-slate-200 overflow-hidden h-[70vh] min-h-[500px]">
+    <div className={`px-5 py-4 flex justify-between items-center ${headerColor}`}>
+      <h2 className="font-extrabold text-slate-900 tracking-tight">{title}</h2>
       <span className="bg-white text-slate-700 text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">{count}</span>
     </div>
     
