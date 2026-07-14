@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Modal from "../../components/Modal";
 import TaskCard, { Task } from "../../components/TaskCard";
+import TaskProgressChart from "../../components/TaskProgressChart";
 import api from "../../lib/axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -153,8 +154,29 @@ export default function PMDashboard() {
       )}
 
       {activeTab === "tasks" && (
-        <div className="pt-4">
+        <div className="pt-4 space-y-8">
           {tasksError && <p className="text-red-500 bg-red-50 p-4 rounded-md">Error loading tasks. Ensure GET /api/tasks exists on backend.</p>}
+          
+          {/* Chart Section */}
+          {!tasksError && !tasksLoading && tasks.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="md:col-span-1">
+                <TaskProgressChart tasks={tasks} />
+              </div>
+              <div className="md:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-sm border border-indigo-400 p-8 flex flex-col justify-center text-white relative overflow-hidden">
+                <div className="relative z-10">
+                  <h2 className="text-3xl font-black mb-2">You're doing great!</h2>
+                  <p className="text-indigo-100 font-medium max-w-md leading-relaxed">
+                    Keep track of your team's velocity. Currently, {tasks.filter(t => t.status === 'completed').length} out of {tasks.length} tasks are fully completed.
+                  </p>
+                </div>
+                {/* Decorative background circle */}
+                <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-white opacity-10 rounded-full blur-2xl"></div>
+              </div>
+            </div>
+          )}
+
+          {/* Tasks Grid */}
           {tasksLoading ? renderCardSkeleton() : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {tasks.map(task => (
