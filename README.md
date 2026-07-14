@@ -57,7 +57,7 @@ The **PTTM-Platform** is a comprehensive task management solution that empowers 
 ## 🔗 Live Links
 
 - **Frontend (Vercel):** [https://pttm-platform.vercel.app](#) *(Placeholder)*
-- **Backend API (Render):** [https://pttm-api.onrender.com](#) *(Placeholder)*
+- **Backend API (Render):** [https://pttm-platform.onrender.com/api](#) *(Placeholder)*
 
 ---
 
