@@ -38,7 +38,7 @@ export default function Home() {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Smart Kanban</h3>
-            <p className="text-slate-600">Drag, drop, and optimize your team's workflow in real time with optimistic UI updates.</p>
+            <p className="text-slate-600">Drag, drop, and optimize your team&apos;s workflow in real time with optimistic UI updates.</p>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 text-emerald-600">

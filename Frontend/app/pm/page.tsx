@@ -87,6 +87,7 @@ export default function PMDashboard() {
       await api.post("/tasks", data);
       mutateTasks(); // Refetch tasks automatically
       closeModal();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create task", error);
       alert(`Failed to create task: ${error.response?.data?.error || error.message}`);
@@ -101,6 +102,7 @@ export default function PMDashboard() {
       await api.post("/projects", data);
       mutateProjects(); // Refetch projects automatically
       closeProjectModal();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create project", error);
       alert(`Failed to create project: ${error.response?.data?.error || error.message}`);
@@ -213,9 +215,9 @@ export default function PMDashboard() {
               </div>
               <div className="md:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-sm border border-indigo-400 p-8 flex flex-col justify-center text-white relative overflow-hidden">
                 <div className="relative z-10">
-                  <h2 className="text-3xl font-black mb-2">You're doing great!</h2>
+                  <h2 className="text-3xl font-black mb-2">You&apos;re doing great!</h2>
                   <p className="text-indigo-100 font-medium max-w-md leading-relaxed">
-                    Keep track of your team's velocity. Currently, {tasks.filter(t => t.status === 'completed').length} out of {tasks.length} tasks are fully completed.
+                    Keep track of your team&apos;s velocity. Currently, {tasks.filter(t => t.status === 'completed').length} out of {tasks.length} tasks are fully completed.
                   </p>
                 </div>
                 {/* Decorative background circle */}

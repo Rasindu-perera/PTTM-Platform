@@ -60,6 +60,7 @@ export default function AdminDashboard() {
       mutateUsers();
       setIsModalOpen(false);
       setNewUser({ name: "", email: "", password: "", role: "team_member" });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
        console.error("Failed to create user", error);
        alert(`Failed to create user: ${error.response?.data?.error || error.message}`);
@@ -76,6 +77,7 @@ export default function AdminDashboard() {
       mutateProjects();
       setIsProjectModalOpen(false);
       setNewProject({ name: "", description: "", manager_id: "" });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to create project", error);
       alert(`Failed to create project: ${error.response?.data?.error || error.message}`);
