@@ -78,14 +78,29 @@ const getTasksByProject = async (req, res) => {
  * GET /api/tasks
  */
 const getAllTasks = async (req, res) => {
+  const user = req.user;
   try {
-    const query = `
-      SELECT tasks.*, users.name AS assigned_to_name 
-      FROM tasks 
-      LEFT JOIN users ON tasks.assigned_to_id = users.id 
-      ORDER BY tasks.created_at DESC
-    `;
-    const result = await db.query(query);
+    let query;
+    let params = [];
+    
+    if (user.role === 'team_member') {
+      query = `
+        SELECT tasks.*, users.name AS assigned_to_name 
+        FROM tasks 
+        LEFT JOIN users ON tasks.assigned_to_id = users.id 
+        WHERE tasks.assigned_to_id = $1
+        ORDER BY tasks.created_at DESC
+      `;
+      params = [user.id];
+    } else {
+      query = `
+        SELECT tasks.*, users.name AS assigned_to_name 
+        FROM tasks 
+        LEFT JOIN users ON tasks.assigned_to_id = users.id 
+        ORDER BY tasks.created_at DESC
+      `;
+    }
+    const result = await db.query(query, params);
     
     res.status(200).json({ tasks: result.rows });
   } catch (error) {

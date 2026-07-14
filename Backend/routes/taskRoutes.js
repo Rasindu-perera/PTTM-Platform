@@ -15,11 +15,11 @@ router.post(
 
 // Get all tasks
 // GET /api/tasks
-// Allowed: 'admin', 'project_manager'
+// Allowed: 'admin', 'project_manager', 'team_member'
 router.get(
   '/', 
   verifyToken, 
-  checkRole(['admin', 'project_manager']), 
+  checkRole(['admin', 'project_manager', 'team_member']), 
   taskController.getAllTasks
 );
 

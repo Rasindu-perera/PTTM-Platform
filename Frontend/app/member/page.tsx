@@ -62,19 +62,9 @@ export default function MemberDashboard() {
   }, [user, router]);
 
   // Using SWR for real data fetching. 
-  // We use fallbackData to populate the board while developing/if endpoint fails.
   const { data: tasksData, error: tasksError, mutate, isLoading } = useSWR(
     user?.role === "team_member" ? "/tasks" : null,
-    fetcher,
-    {
-       fallbackData: {
-         tasks: [
-          { id: 201, project_id: 1, title: "Setup Local Environment", description: "Install Node.js, clone the repository, and run npm install.", status: "completed", assigned_to_id: user?.id || 0, assigned_to_name: user?.name },
-          { id: 202, project_id: 1, title: "Implement Kanban UI", description: "Design a 3-column responsive flexbox layout in Tailwind.", status: "in_progress", assigned_to_id: user?.id || 0, assigned_to_name: user?.name },
-          { id: 203, project_id: 2, title: "Write Unit Tests", description: "Ensure the AuthContext works correctly with mock localStorage.", status: "pending", assigned_to_id: user?.id || 0, assigned_to_name: user?.name },
-         ]
-       }
-    }
+    fetcher
   );
 
   const tasks: Task[] = Array.isArray(tasksData) ? tasksData : tasksData?.tasks || [];
@@ -148,9 +138,9 @@ export default function MemberDashboard() {
       )}
 
       {tasksError && (
-         <div className="mb-6 bg-amber-50 text-amber-700 p-4 rounded-xl font-semibold border border-amber-200 shadow-sm flex items-center">
-           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path></svg>
-           Note: Showing mocked offline data. Ensure your Backend API is running.
+         <div className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl font-semibold border border-red-200 shadow-sm flex items-center">
+           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path></svg>
+           Failed to load tasks. Please ensure the backend server is running.
          </div>
       )}
 
