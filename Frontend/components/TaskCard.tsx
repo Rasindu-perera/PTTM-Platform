@@ -13,9 +13,10 @@ export interface Task {
 interface TaskCardProps {
   task: Task;
   onEdit?: (task: Task) => void;
+  onStatusChange?: (taskId: number, newStatus: 'pending' | 'in_progress' | 'completed') => void;
 }
 
-export default function TaskCard({ task, onEdit }: TaskCardProps) {
+export default function TaskCard({ task, onEdit, onStatusChange }: TaskCardProps) {
   // Map statuses to distinct visual colors
   const statusColors = {
     pending: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -45,18 +46,34 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
       </p>
 
       <div className="mt-auto pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+        <div className="text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 truncate">
           Assignee: <span className="text-slate-700">{task.assigned_to_name || `User ID: ${task.assigned_to_id}`}</span>
         </div>
         
-        {onEdit && (
-          <button 
-            onClick={() => onEdit(task)}
-            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline px-2 py-1 transition-colors"
-          >
-            Edit Task
-          </button>
-        )}
+        <div className="flex items-center space-x-2">
+          {/* Render status dropdown if onStatusChange is provided */}
+          {onStatusChange && (
+            <select
+              value={task.status}
+              onChange={(e) => onStatusChange(task.id, e.target.value as any)}
+              className="text-xs font-bold bg-white border border-slate-300 rounded-md px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
+            >
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          )}
+
+          {/* Render edit button if onEdit is provided */}
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(task)}
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline px-2 py-1 transition-colors"
+            >
+              Edit
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
