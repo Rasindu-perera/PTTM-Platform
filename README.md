@@ -54,6 +54,12 @@ The **PTTM-Platform** is a comprehensive task management solution that empowers 
 
 ---
 
+## 📄 API Documentation (Postman Collection)
+
+A complete Postman collection (`postman_collection.json`) is included in the `Backend` directory of this repository. Evaluators and developers can directly import this JSON file into Postman to test all Authentication, Project, and Task endpoints with pre-configured request bodies and variable environments.
+
+---
+
 ## 🔗 Live Links
 
 - **Frontend (Vercel):** [https://pttm-platform.vercel.app](#) *(Placeholder)*
