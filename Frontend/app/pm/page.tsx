@@ -5,13 +5,29 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Modal from "../../components/Modal";
 import TaskCard, { Task } from "../../components/TaskCard";
+import api from "../../lib/axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// 1. Define Zod Schema for robust validation
+const taskSchema = z.object({
+  title: z.string().min(3, { message: "Title must be at least 3 characters." }),
+  description: z.string().min(1, { message: "Description is required." }),
+  project_id: z.string().min(1, { message: "Please select a project." }),
+  status: z.enum(["pending", "in_progress", "completed"]),
+  assigned_to_id: z.string().min(1, { message: "Please assign the task to a team member." }),
+});
+
+// Infer TypeScript types directly from the Zod schema
+type TaskFormValues = z.infer<typeof taskSchema>;
 
 // Mock Data Types
 interface Project {
   id: number;
   name: string;
   description: string;
-  team_members: string[]; // Mock array of names for UI purposes
+  team_members: string[]; 
 }
 
 export default function PMDashboard() {
@@ -22,15 +38,24 @@ export default function PMDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Modal State
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [newTask, setNewTask] = useState({
-    title: "",
-    description: "",
-    project_id: "",
-    assigned_to_id: "",
-    status: "pending" as const,
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 2. Initialize react-hook-form with zodResolver
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TaskFormValues>({
+    resolver: zodResolver(taskSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      project_id: "",
+      status: "pending",
+      assigned_to_id: "",
+    },
   });
 
   // Auth Protection - strictly for 'project_manager'
@@ -46,7 +71,6 @@ export default function PMDashboard() {
   useEffect(() => {
     if (!user || user.role !== "project_manager") return;
 
-    // Simulating fetching /api/projects and /api/tasks
     setTimeout(() => {
       setProjects([
         { id: 1, name: "Alpha Release", description: "First major milestone for the product including core features.", team_members: ["Alice", "Bob"] },
@@ -61,24 +85,42 @@ export default function PMDashboard() {
     }, 600);
   }, [user]);
 
-  const handleCreateTask = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 3. Form Submit Handler (Only runs if validation passes)
+  const onSubmit = async (data: TaskFormValues) => {
+    setIsSubmitting(true);
     
-    const assignedUserNames: Record<string, string> = { "3": "Alice", "4": "Bob", "5": "Charlie" };
+    try {
+      // --- REAL API CALL via Axios ---
+      // const response = await api.post("/tasks", data);
+      // const createdTask = response.data.task;
+      
+      // Simulate network request
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-    const createdTask: Task = {
-      id: Math.floor(Math.random() * 1000) + 200,
-      project_id: Number(newTask.project_id),
-      title: newTask.title,
-      description: newTask.description,
-      status: newTask.status,
-      assigned_to_id: Number(newTask.assigned_to_id),
-      assigned_to_name: assignedUserNames[newTask.assigned_to_id] || "Unknown",
-    };
+      const assignedUserNames: Record<string, string> = { "3": "Alice", "4": "Bob", "5": "Charlie" };
+      const createdTask: Task = {
+        id: Math.floor(Math.random() * 1000) + 200,
+        project_id: Number(data.project_id),
+        title: data.title,
+        description: data.description,
+        status: data.status,
+        assigned_to_id: Number(data.assigned_to_id),
+        assigned_to_name: assignedUserNames[data.assigned_to_id] || "Unknown",
+      };
 
-    setTasks([createdTask, ...tasks]);
+      setTasks([createdTask, ...tasks]);
+      closeModal();
+    } catch (error) {
+      console.error("Failed to create task", error);
+      // In a real app, display a toast or error alert here
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const closeModal = () => {
     setIsTaskModalOpen(false);
-    setNewTask({ title: "", description: "", project_id: "", assigned_to_id: "", status: "pending" });
+    reset(); // Reset form errors and values when closing
   };
 
   if (!user || user.role !== "project_manager" || isLoading) {
@@ -104,7 +146,7 @@ export default function PMDashboard() {
         </button>
       </header>
 
-      {/* Modern Tab Navigation */}
+      {/* Tab Navigation */}
       <div className="flex overflow-x-auto border-b border-slate-200 hide-scrollbar">
         <button
           onClick={() => setActiveTab("projects")}
@@ -162,89 +204,110 @@ export default function PMDashboard() {
         </div>
       )}
 
-      {/* Create Task Modal */}
-      <Modal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} title="Create New Task">
-        <form onSubmit={handleCreateTask} className="space-y-4">
+      {/* Create Task Modal with Zod + React Hook Form */}
+      <Modal isOpen={isTaskModalOpen} onClose={closeModal} title="Create New Task">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Task Title</label>
             <input 
-              required
+              {...register("title")}
               type="text" 
-              value={newTask.title}
-              onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-slate-50 focus:bg-white"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-slate-50 focus:bg-white ${
+                errors.title ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              }`}
               placeholder="E.g., Implement authentication"
             />
+            {errors.title && <p className="text-red-500 text-xs font-medium mt-1.5">{errors.title.message}</p>}
           </div>
+
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
             <textarea 
-              required
+              {...register("description")}
               rows={3}
-              value={newTask.description}
-              onChange={(e) => setNewTask({...newTask, description: e.target.value})}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow resize-none bg-slate-50 focus:bg-white"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow resize-none bg-slate-50 focus:bg-white ${
+                errors.description ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              }`}
               placeholder="Detailed task instructions..."
             />
+            {errors.description && <p className="text-red-500 text-xs font-medium mt-1.5">{errors.description.message}</p>}
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Project</label>
               <select 
-                required
-                value={newTask.project_id}
-                onChange={(e) => setNewTask({...newTask, project_id: e.target.value})}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white cursor-pointer"
+                {...register("project_id")}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white cursor-pointer ${
+                  errors.project_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+                }`}
               >
                 <option value="" disabled>Select Project...</option>
                 {projects.map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
+              {errors.project_id && <p className="text-red-500 text-xs font-medium mt-1.5">{errors.project_id.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Status</label>
               <select 
-                value={newTask.status}
-                onChange={(e) => setNewTask({...newTask, status: e.target.value as any})}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white cursor-pointer"
+                {...register("status")}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white cursor-pointer ${
+                  errors.status ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+                }`}
               >
                 <option value="pending">Pending</option>
                 <option value="in_progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
+              {errors.status && <p className="text-red-500 text-xs font-medium mt-1.5">{errors.status.message}</p>}
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Assign To</label>
             <select 
-              required
-              value={newTask.assigned_to_id}
-              onChange={(e) => setNewTask({...newTask, assigned_to_id: e.target.value})}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white cursor-pointer"
+              {...register("assigned_to_id")}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white cursor-pointer ${
+                errors.assigned_to_id ? "border-red-500 ring-1 ring-red-500" : "border-slate-300"
+              }`}
             >
               <option value="" disabled>Select Team Member...</option>
               <option value="3">Alice</option>
               <option value="4">Bob</option>
               <option value="5">Charlie</option>
             </select>
+            {errors.assigned_to_id && <p className="text-red-500 text-xs font-medium mt-1.5">{errors.assigned_to_id.message}</p>}
           </div>
 
           <div className="pt-5 flex flex-col-reverse sm:flex-row gap-3">
             <button 
               type="button"
-              onClick={() => setIsTaskModalOpen(false)}
+              onClick={closeModal}
+              disabled={isSubmitting}
               className="w-full sm:flex-1 px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all font-bold"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-bold"
+              disabled={isSubmitting}
+              className={`w-full sm:flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md transform hover:-translate-y-0.5 font-bold flex justify-center items-center ${
+                isSubmitting ? "opacity-70 cursor-wait" : ""
+              }`}
             >
-              Create Task
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </>
+              ) : (
+                "Create Task"
+              )}
             </button>
           </div>
         </form>
