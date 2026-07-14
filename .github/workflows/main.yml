@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: ./Frontend/package-lock.json
 
@@ -37,7 +37,7 @@ jobs:
 
       # 4. Run ESLint to catch syntax and style issues
       - name: Run Linter
-        run: npx next lint --dir app
+        run: npx next lint
 
       # 5. Build the Next.js application to ensure it compiles without errors
       - name: Build Application
@@ -62,7 +62,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           # If the Backend doesn't have a package-lock.json committed yet, you can remove these cache lines
           cache: 'npm'
           cache-dependency-path: ./Backend/package-lock.json
