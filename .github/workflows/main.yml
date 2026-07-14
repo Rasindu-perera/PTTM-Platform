@@ -37,7 +37,7 @@ jobs:
 
       # 4. Run ESLint to catch syntax and style issues
       - name: Run Linter
-        run: npm run lint
+        run: npx next lint --dir app
 
       # 5. Build the Next.js application to ensure it compiles without errors
       - name: Build Application
