@@ -55,7 +55,7 @@ export default function TaskCard({ task, onEdit, onStatusChange }: TaskCardProps
           {onStatusChange && (
             <select
               value={task.status}
-              onChange={(e) => onStatusChange(task.id, e.target.value as any)}
+              onChange={(e) => onStatusChange(task.id, e.target.value as 'pending' | 'in_progress' | 'completed')}
               className="text-xs font-bold bg-white border border-slate-300 rounded-md px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
             >
               <option value="pending">Pending</option>

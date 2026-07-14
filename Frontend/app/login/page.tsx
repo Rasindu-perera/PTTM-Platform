@@ -49,6 +49,7 @@ export default function LoginPage() {
         default:
           router.push("/");
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       // Axios wraps API responses in err.response
       if (err.response && err.response.data && err.response.data.error) {
@@ -127,7 +128,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-sm text-slate-500">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">
             Register here
           </Link>

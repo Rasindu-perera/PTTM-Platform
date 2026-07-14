@@ -9,6 +9,43 @@ import useSWR from "swr";
 
 const fetcher = (url: string) => api.get(url).then(res => res.data);
 
+interface KanbanColumnProps {
+  title: string;
+  count: number;
+  headerColor: string;
+  items: Task[];
+  isLoading: boolean;
+  onStatusChange: (taskId: number, newStatus: 'pending' | 'in_progress' | 'completed') => void;
+}
+
+const KanbanColumn = ({ title, count, headerColor, items, isLoading, onStatusChange }: KanbanColumnProps) => (
+  <div className="flex flex-col bg-slate-100/50 rounded-2xl border border-slate-200 overflow-hidden h-[70vh] min-h-[500px]">
+    <div className={`px-5 py-4 border-b border-slate-200 flex justify-between items-center ${headerColor}`}>
+      <h2 className="font-extrabold text-slate-800 tracking-tight">{title}</h2>
+      <span className="bg-white text-slate-700 text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">{count}</span>
+    </div>
+    
+    <div className="p-4 flex-grow flex flex-col gap-4 overflow-y-auto hide-scrollbar">
+      {isLoading && items.length === 0 ? (
+        <div className="animate-pulse bg-white rounded-xl h-32 w-full"></div>
+      ) : items.map(task => (
+        <div key={task.id} className="transform transition-all duration-300 hover:-translate-y-1">
+          <TaskCard task={task} onStatusChange={onStatusChange} />
+        </div>
+      ))}
+      
+      {!isLoading && items.length === 0 && (
+        <div className="h-full flex flex-col items-center justify-center text-slate-400 font-medium italic border-2 border-dashed border-slate-300 rounded-xl p-8 opacity-70">
+          <svg className="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <p>No tasks here</p>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
 export default function MemberDashboard() {
   const { user } = useAuth();
   const router = useRouter();
@@ -91,33 +128,7 @@ export default function MemberDashboard() {
   const inProgressTasks = tasks.filter(t => t.status === "in_progress");
   const completedTasks = tasks.filter(t => t.status === "completed");
 
-  const KanbanColumn = ({ title, count, headerColor, items }: { title: string, count: number, headerColor: string, items: Task[] }) => (
-    <div className="flex flex-col bg-slate-100/50 rounded-2xl border border-slate-200 overflow-hidden h-[70vh] min-h-[500px]">
-      <div className={`px-5 py-4 border-b border-slate-200 flex justify-between items-center ${headerColor}`}>
-        <h2 className="font-extrabold text-slate-800 tracking-tight">{title}</h2>
-        <span className="bg-white text-slate-700 text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">{count}</span>
-      </div>
-      
-      <div className="p-4 flex-grow flex flex-col gap-4 overflow-y-auto hide-scrollbar">
-        {isLoading && items.length === 0 ? (
-          <div className="animate-pulse bg-white rounded-xl h-32 w-full"></div>
-        ) : items.map(task => (
-          <div key={task.id} className="transform transition-all duration-300 hover:-translate-y-1">
-            <TaskCard task={task} onStatusChange={handleStatusChange} />
-          </div>
-        ))}
-        
-        {!isLoading && items.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-slate-400 font-medium italic border-2 border-dashed border-slate-300 rounded-xl p-8 opacity-70">
-            <svg className="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <p>No tasks here</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+
 
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-500 relative">
@@ -144,9 +155,9 @@ export default function MemberDashboard() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow pb-8">
-        <KanbanColumn title="Pending" count={pendingTasks.length} headerColor="bg-amber-100" items={pendingTasks} />
-        <KanbanColumn title="In Progress" count={inProgressTasks.length} headerColor="bg-blue-100" items={inProgressTasks} />
-        <KanbanColumn title="Completed" count={completedTasks.length} headerColor="bg-emerald-100" items={completedTasks} />
+        <KanbanColumn title="Pending" count={pendingTasks.length} headerColor="bg-amber-100" items={pendingTasks} isLoading={isLoading} onStatusChange={handleStatusChange} />
+        <KanbanColumn title="In Progress" count={inProgressTasks.length} headerColor="bg-blue-100" items={inProgressTasks} isLoading={isLoading} onStatusChange={handleStatusChange} />
+        <KanbanColumn title="Completed" count={completedTasks.length} headerColor="bg-emerald-100" items={completedTasks} isLoading={isLoading} onStatusChange={handleStatusChange} />
       </div>
     </div>
   );
