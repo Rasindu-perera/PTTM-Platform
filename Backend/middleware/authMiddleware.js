@@ -14,8 +14,8 @@ const verifyToken = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_temporary_secret');
+    // Verify token using strict .env secret
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Attach the user payload to the request object
     req.user = decoded;

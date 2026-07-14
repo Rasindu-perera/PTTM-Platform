@@ -59,8 +59,8 @@ const login = async (req, res) => {
       role: user.role,
     };
     
-    // In production, ensure process.env.JWT_SECRET is set
-    const token = jwt.sign(payload, process.env.JWT_SECRET || 'your_temporary_secret', {
+    // Use .env strictly
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
 

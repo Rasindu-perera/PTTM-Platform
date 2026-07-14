@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { sendTaskAssignmentEmail } = require('../utils/emailService');
 
 /**
  * Create a new task
@@ -20,6 +21,24 @@ const createTask = async (req, res) => {
       message: 'Task created successfully',
       task: result.rows[0],
     });
+
+    // --- Send Email Notification Asynchronously ---
+    if (assigned_to_id) {
+      try {
+        const userResult = await db.query('SELECT email FROM users WHERE id = $1', [assigned_to_id]);
+        const projectResult = await db.query('SELECT name FROM projects WHERE id = $1', [project_id]);
+        
+        if (userResult.rows.length > 0 && projectResult.rows.length > 0) {
+          const userEmail = userResult.rows[0].email;
+          const projectName = projectResult.rows[0].name;
+          
+          // Fire and forget - do not block the API response
+          sendTaskAssignmentEmail(userEmail, title, projectName);
+        }
+      } catch (err) {
+        console.error('Error fetching details for email notification:', err);
+      }
+    }
   } catch (error) {
     console.error('Create task error:', error);
     res.status(500).json({ error: 'Internal server error' });
