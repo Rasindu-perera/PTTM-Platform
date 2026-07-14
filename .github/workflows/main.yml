@@ -1,0 +1,74 @@
+name: CI Pipeline
+
+# Trigger the workflow on push or pull request events targeting the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job to validate the Next.js Frontend
+  frontend:
+    name: Validate Frontend
+    runs-on: ubuntu-latest
+
+    # Set the working directory for all run steps in this job
+    defaults:
+      run:
+        working-directory: ./Frontend
+
+    steps:
+      # 1. Check out the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ./Frontend/package-lock.json
+
+      # 3. Install frontend dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # 4. Run ESLint to catch syntax and style issues
+      - name: Run Linter
+        run: npm run lint
+
+      # 5. Build the Next.js application to ensure it compiles without errors
+      - name: Build Application
+        run: npm run build
+
+  # Job to validate the Node.js Backend
+  backend:
+    name: Validate Backend
+    runs-on: ubuntu-latest
+
+    # Set the working directory for all run steps in this job
+    defaults:
+      run:
+        working-directory: ./Backend
+
+    steps:
+      # 1. Check out the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          # If the Backend doesn't have a package-lock.json committed yet, you can remove these cache lines
+          cache: 'npm'
+          cache-dependency-path: ./Backend/package-lock.json
+
+      # 3. Install backend dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # Note: You can add backend testing steps here in the future (e.g., npm test)
