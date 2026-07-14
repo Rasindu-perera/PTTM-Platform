@@ -1,0 +1,63 @@
+import React from 'react';
+
+export interface Task {
+  id: number;
+  project_id: number;
+  title: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  assigned_to_id: number;
+  assigned_to_name?: string; // For UI display
+}
+
+interface TaskCardProps {
+  task: Task;
+  onEdit?: (task: Task) => void;
+}
+
+export default function TaskCard({ task, onEdit }: TaskCardProps) {
+  // Map statuses to distinct visual colors
+  const statusColors = {
+    pending: 'bg-amber-100 text-amber-800 border-amber-200',
+    in_progress: 'bg-blue-100 text-blue-800 border-blue-200',
+    completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  };
+
+  const statusDisplay = {
+    pending: 'Pending',
+    in_progress: 'In Progress',
+    completed: 'Completed',
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow duration-300 flex flex-col h-full group">
+      <div className="flex justify-between items-start mb-3 gap-2">
+        <h4 className="font-bold text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition-colors" title={task.title}>
+          {task.title}
+        </h4>
+        <span className={`text-xs px-2.5 py-1 rounded-full border font-bold whitespace-nowrap ${statusColors[task.status]}`}>
+          {statusDisplay[task.status]}
+        </span>
+      </div>
+      
+      <p className="text-sm text-slate-600 flex-grow mb-5 line-clamp-3 leading-relaxed">
+        {task.description}
+      </p>
+
+      <div className="mt-auto pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+          Assignee: <span className="text-slate-700">{task.assigned_to_name || `User ID: ${task.assigned_to_id}`}</span>
+        </div>
+        
+        {onEdit && (
+          <button 
+            onClick={() => onEdit(task)}
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline px-2 py-1 transition-colors"
+          >
+            Edit Task
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
